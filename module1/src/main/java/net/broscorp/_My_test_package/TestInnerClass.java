@@ -21,7 +21,7 @@ public class TestInnerClass {
         }
     }
 
-    public void ship(String destinat) {
+    void ship(String destinat) {
         Content cont = new Content();
         Destination d = new Destination(destinat);
         System.out.println(d.readLabel());
