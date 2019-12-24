@@ -16,7 +16,7 @@ public class LambdaDemo {
         /** реализация обычная */
         A objXYZ = new XYZ();
         objXYZ.show();
-        /** реализация короткая */
+        /** реализация анонимным классом */
         A obj1 = new A() {
             public void show() {
                 System.out.println("Two");
