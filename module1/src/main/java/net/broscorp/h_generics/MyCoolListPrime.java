@@ -3,74 +3,69 @@ package net.broscorp.h_generics;
 import java.util.Arrays;
 import java.util.function.Function;
 
-public class MyCoolListPrime<E> {
-    private static final int DEFAULT_CAPACITY = 5; // начальный размер списка
-    private static Object[] EMPTY_DATA = {};
-    private Object[] elements; // Буфер массива, в котором хранятся элементы MyCoolListPrime
+public class MyCoolListPrime<T extends Number> {
+    private Object[] elements;
+    private Object[] newArray;
+    private final int DEFAULT_CAPACITY = 3;
     private int size;
 
     MyCoolListPrime() {
-        this.elements = EMPTY_DATA;
+        this.elements = new Object[DEFAULT_CAPACITY];
     }
 
-    void add(E e) {
-        int minCapacity = size + 1;
-        if (minCapacity - elements.length > 0)
-            grow(minCapacity);
-        elements[size] = e;
-        size++;
+    private void checkCapacity() {
+        if (size >= elements.length) {
+            grow();
+        }
     }
 
-    private void grow(int minCapacity) {
-        int oldCapacity = elements.length;
-        int newCapacity = oldCapacity + DEFAULT_CAPACITY;
-        if (minCapacity < 0) // overflow
-            throw new OutOfMemoryError();
+    public boolean add(T o) {
+        checkCapacity();
+        elements[size++] = o;
+        return true;
+    }
+
+    private void grow() {
+        int newCapacity = elements.length * 2;
         elements = Arrays.copyOf(elements, newCapacity);
     }
 
-    Object get(int index) throws ArrayIndexOutOfBoundsException {
-        try {
-            return elements[index];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return "Incorrect index: " + index;
+    public T get(int index) {
+        if (index > size - 1) {
+            System.out.println("Array max index = " + size + ": requesing_" + index);
         }
+        return (T) elements[index];
     }
 
-    void remove(int index) {
-        try {
-            if (index >= size) {
-                throw new IndexOutOfBoundsException();
-            } else {
-                int numMoved = size - index - 1;
-                if (numMoved > 0)
-                    System.arraycopy(elements, index + 1, elements, index,
-                            numMoved);
-                elements[--size] = null;
-            }
-        } catch (IndexOutOfBoundsException e) {
-            System.out.println("Limit index empty: " + index);
+    public void remove(int index) {
+        checkCapacity();
+        int elemForCopy = elements.length - index - 1;
+        if (index > size - 1) {
+            System.out.println("Incorrect index: " + index);
+            return;
+        } else {
+            System.arraycopy(elements, index + 1, elements, index, elemForCopy);
         }
+        size--;
     }
 
-    public Object map(Function f) { // Функциональный интерфейс Function<T,R> представляет функцию перехода от объекта типа T к объекту типа R:
-        //f=Arrays.stream(elements).map(a->elements).toArray();
-        Function<Object[], Number> convert = o-> (Number) new Object();
-        //convert.apply(elements);
-        //convert.apply(elements);
-        return convert.apply(elements);
-        //return null;
+    public MyCoolListPrime<? extends Number> map(Function<T, ? extends Number> f) {
+        MyCoolListPrime<Number> myArrayList = new MyCoolListPrime<>();
+        for (int i = 0; i < size; i++) {
+            myArrayList.add(f.apply((T) elements[i]));
+        }
+        return myArrayList;
     }
 
     @Override
     public String toString() {
         trimToSize();
-        return "MyCoolListPrime{" + "elementData=" + Arrays.toString(elements) + '}';
+        return "MyArrayList{" + "elements=" + Arrays.toString(newArray) + '}';
     }
 
     private void trimToSize() {
-        if (size < elements.length) {
-            elements = (size == 0) ? EMPTY_DATA : Arrays.copyOf(elements, size);
+        if (size <= elements.length) {
+            newArray = (size == 0) ? new Object[0] : Arrays.copyOf(elements, size);
         }
     }
 }
